@@ -155,10 +155,12 @@ HTML;
 
 } // class Threads_Widget
 
+/** Initialize the widget. */
 add_action( 'widgets_init', function () {
 	register_widget( 'ThreadsOKC\Workday\Threads_Widget' );
 } );
 
+/** Handle form submission to generate ICS file. */
 add_action( 'init', function () {
 	if ( ( 'POST' == $_SERVER['REQUEST_METHOD'] )
 			&& isset( $_POST['threads-next-workday_nonce'] )
