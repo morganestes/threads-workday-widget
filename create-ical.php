@@ -28,50 +28,92 @@
 //    to set, including alarms, invitees, busy status, etc.
 //
 //      https://www.ietf.org/rfc/rfc5545.txt
-if( !isset( $_POST['nonce'] ) )
-	die();
+namespace ThreadsOKC\Workday;
 
-$summary = $_POST['summary'];
-$datestart = $_POST['datestart'];
-$dateend = $_POST['dateend'];
-$address = $_POST['address'];
-$uri = $_POST['uri'];
-$description = $_POST['description'];
-$filename = $_POST['filename'];
-// 1. Set the correct headers for this file
-header('Content-type: text/calendar; charset=utf-8');
-header('Content-Disposition: attachment; filename=' . $filename);
+/**
+ * Class Calendar
+ *
+ * @package ThreadsOKC\Workday
+ */
+class Calendar {
 
-// 2. Define helper functions
+	private $summary = '';
+	private $date_start = '';
+	private $date_end = '';
+	private $address = '';
+	private $uri = '';
+	private $description = '';
+	private $filename = '';
 
-// Converts a unix timestamp to an ics-friendly format
-// NOTE: "Z" means that this timestamp is a UTC timestamp. If you need
-// to set a locale, remove the "\Z" and modify DTEND, DTSTAMP and DTSTART
-// with TZID properties (see RFC 5545 section 3.3.5 for info)
-function dateToCal($timestamp) {
-	return date('Ymd\THis', $timestamp);
-}
 
-// Escapes a string of characters
-function escapeString($string) {
-	return preg_replace('/([\,;])/','\\\$1', $string);
-}
+	public function __construct() {
+
+		$this->summary     = wp_kses_stripslashes( $_POST['summary'] );
+		$this->date_start  = wp_kses_stripslashes( $_POST['datestart'] );
+		$this->date_end    = wp_kses_stripslashes( $_POST['dateend'] );
+		$this->address     = wp_kses_stripslashes( $_POST['address'] );
+		$this->uri         = esc_url_raw( $_POST['uri'] );
+		$this->description = wp_kses_stripslashes( $_POST['description'] );
+		$this->filename    = wp_kses_stripslashes( $_POST['filename'] );
+	}
+
+
+	/**
+	 * Converts a unix timestamp to an ics-friendly format.
+	 * NOTE: "Z" means that this timestamp is a UTC timestamp. If you need
+	 * to set a locale, remove the "\Z" and modify DTEND, DTSTAMP and DTSTART
+	 * with TZID properties (see RFC 5545 section 3.3.5 for info).
+	 *
+	 * @param $timestamp
+	 *
+	 * @return bool|string
+	 */
+	private function date_to_cal( $timestamp ) {
+		return date( 'Ymd\THis', $timestamp );
+	}
 
 // 3. Echo out the ics file's contents
-$br = "\n";
-?>
+	public function create_ics() {
+		if ( empty( $_POST ) || ! wp_verify_nonce( $_POST['threads-next-workday_nonce'], 'build_calendar' ) ) {
+			print 'Sorry, your nonce did not verify.';
+			wp_die( 'Sorry, your nonce did not verify.', 'Error' );
+		}
+
+		$br          = "\n";
+		$date_start  = $this->date_to_cal( $this->date_start );
+		$date_end    = $this->date_to_cal( $this->date_end );
+		$uid         = uniqid();
+		$time_stamp  = $this->date_to_cal( time() );
+		$location    = $this->address;
+		$description = $this->description;
+		$uri         = $this->uri;
+		$summary     = $this->summary;
+
+		$ical = <<<EOF
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//hacksw/handcal//NONSGML v1.0//EN
 CALSCALE:GREGORIAN
 BEGIN:VEVENT
-DTSTART:<?php echo dateToCal($datestart) . $br; ?>
-DTEND:<?php echo dateToCal($dateend) . $br; ?>
-UID:<?php echo uniqid() . $br; ?>
-DTSTAMP:<?php echo dateToCal(time()) . $br; ?>
-LOCATION:<?php echo escapeString($address) . $br; ?>
-DESCRIPTION:<?php echo escapeString($description) . $br; ?>
-URL;VALUE=URI:<?php echo escapeString($uri) . $br; ?>
-SUMMARY:<?php echo escapeString($summary) . $br; ?>
+DTSTART:{$date_start}
+DTEND:{$date_end}
+UID:{$uid}
+DTSTAMP:{$time_stamp}
+LOCATION:{$location}
+DESCRIPTION:{$description}
+URL;VALUE=URI:{$uri}
+SUMMARY:{$summary}
 END:VEVENT
 END:VCALENDAR';
+EOF;
+
+		// 1. Set the correct headers for this file
+		header( 'Content-type: text/calendar; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename=' . $this->filename );
+
+		ob_start();
+		echo $ical;
+		ob_end_flush();
+		exit;
+	}
+}
