@@ -90,8 +90,7 @@ HTML;
 		echo $args['before_widget'];
 		if ( ! empty( $title ) )
 			echo $args['before_title'] . $title . $args['after_title'];
-		echo "<strong>$display_date</strong>";
-		//echo '<a href="' . esc_attr( $ics_url ) . '" title="' . esc_attr( __('Add to calendar', 'threadsokc' ) ) .'" />&emsp;<img src="'. $this->plugin_url . 'calendar_add.png' . '" /></a>';
+		echo "<strong class='date'>$display_date</strong>";
 		echo $ics_form;
 		if ( ! empty( $extra_info ) ) {
 			echo "<p>$extra_info</p>";
