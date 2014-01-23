@@ -104,7 +104,7 @@ HTML;
 			echo "<p>$extra_info</p>";
 		}
 		echo $ics_form;
-		echo "<a href='{$google_calendar_link}' target='" . esc_attr( '_blank' ) . "'><img src='//www.google.com/calendar/images/ext/gc_button1.gif' border=0></a>";
+		// echo "<a href='{$google_calendar_link}' target='" . esc_attr( '_blank' ) . "'><img src='//www.google.com/calendar/images/ext/gc_button1.gif' border=0></a>";
 		echo $args['after_widget'];
 	}
 
