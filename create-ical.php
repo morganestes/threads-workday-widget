@@ -46,7 +46,7 @@ class Calendar {
 	private $filename = '';
 
 
-	public function __construct() {
+	public function __construct( $time_zone = 'America/Chicago' ) {
 
 		$this->summary     = wp_kses_stripslashes( $_POST['summary'] );
 		$this->date_start  = wp_kses_stripslashes( $_POST['datestart'] );
@@ -55,6 +55,8 @@ class Calendar {
 		$this->uri         = esc_url_raw( $_POST['uri'] );
 		$this->description = wp_kses_stripslashes( $_POST['description'] );
 		$this->filename    = wp_kses_stripslashes( $_POST['filename'] );
+
+		date_default_timezone_set( $time_zone );
 	}
 
 
@@ -69,7 +71,7 @@ class Calendar {
 	 * @return bool|string
 	 */
 	private function date_to_cal( $timestamp ) {
-		return date( 'Ymd\THis', $timestamp );
+		return date( 'Ymd\THisP', $timestamp );
 	}
 
 // 3. Echo out the ics file's contents

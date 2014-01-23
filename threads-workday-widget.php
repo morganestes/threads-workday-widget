@@ -3,7 +3,7 @@
 Plugin Name: Threads OKC Workdays
 Plugin URI: http://threadsokc.github.io/workday-widget
 Description: Adds a widget with the upcoming work day.
-Version: 0.1.0
+Version: 0.2.0
 Author: morganestes
 Author URI: http://www.morganestes.me
 License: GPLv2 or later
@@ -12,7 +12,6 @@ License: GPLv2 or later
 
 namespace ThreadsOKC\Workday;
 
-use ThreadsOKC\Workday\Calendar;
 use WP_Widget;
 
 include_once __DIR__ . '/create-ical.php';
@@ -31,9 +30,9 @@ class Threads_Widget extends \WP_Widget {
 	 */
 	function __construct() {
 		parent::__construct(
-			'threads_widget', // Base ID
-			'Threads Workdays', // Name
-			array( 'description' => __( 'Display the next scheduled workday', 'threadsokc' ), ) // Args
+				'threads_widget', // Base ID
+				'Threads Workdays', // Name
+				array( 'description' => __( 'Display the next scheduled workday', 'threadsokc' ), ) // Args
 		);
 
 		$this->plugin_dir  = plugin_dir_path( __FILE__ );
@@ -58,20 +57,25 @@ class Threads_Widget extends \WP_Widget {
 		$display_date = date( 'F d, Y', strtotime( $date ) );
 		$ics_date     = date( 'Ymd', strtotime( $date ) );
 
-		$event_info  = array(
-			'datestart'   => strtotime( $ics_date . 'T140000' ),
-			'dateend'     => strtotime( $ics_date . 'T170000' ),
-			'address'     => esc_html( '2221 E. Memorial Rd., Edmond, OK 73013', 'threadsokc' ),
-			'uri'         => esc_url( 'http://www.threadsokc.org/events.html' ),
-			'filename'    => "threadsokc-workday-{$date}.ics",
-			'summary'     => __( 'Threads OKC Workday', 'threadsokc' ),
-			'description' => __( '', 'threadsokc' ),
+		$event_info           = array(
+				'datestart'   => strtotime( $ics_date . 'T190000Z' ),
+				'dateend'     => strtotime( $ics_date . 'T220000Z' ),
+				'address'     => esc_html( '2221 E. Memorial Rd., Edmond, OK 73013', 'threadsokc' ),
+				'uri'         => esc_url( 'http://www.threadsokc.org/events.html' ),
+				'filename'    => "threadsokc-workday-{$date}.ics",
+				'summary'     => __( 'Threads OKC Workday', 'threadsokc' ),
+				'description' => __( '', 'threadsokc' ),
 		);
-		$ics_file    = plugin_dir_url( __FILE__ ) . 'create-ical.php';
-		$ics_url     = add_query_arg( $event_info, $ics_file );
-		$cal_img     = $this->plugin_url . 'calendar_add.png';
-		$nonce       = wp_create_nonce( $this->plugin_name );
-		$nonce_field = wp_nonce_field( 'build_calendar', "{$this->plugin_name}_nonce", false, false );
+		$google_calendar_atts = array(
+				'sprop'    => rawurlencode( __( 'Threads of Compassion OKC', 'threadsokc' ) ),
+				'location' => rawurlencode( $event_info['address'] ),
+				'text'     => rawurlencode( $event_info['summary'] ),
+		);
+		$ics_file             = plugin_dir_url( __FILE__ ) . 'create-ical.php';
+		$ics_url              = add_query_arg( $event_info, $ics_file );
+		$cal_img              = $this->plugin_url . 'calendar_add.png';
+		$nonce                = wp_create_nonce( $this->plugin_name );
+		$nonce_field          = wp_nonce_field( 'build_calendar', "{$this->plugin_name}_nonce", false, false );
 
 		$ics_form = <<<HTML
 		<form style="display: inline" method="post" name="build-ics" action="#">
@@ -87,14 +91,20 @@ class Threads_Widget extends \WP_Widget {
 </form>
 HTML;
 
+		$google_calendar_link = esc_url( "http://www.google.com/calendar/event?action=TEMPLATE&text={$google_calendar_atts['text']}&dates={$event_info['datestart']}/{$event_info['dateend']}&details=&location={$google_calendar_atts['location']}&trp=false&sprop={$google_calendar_atts['sprop']}&sprop=name:{$event_info['uri']}" );
+
 		echo $args['before_widget'];
-		if ( ! empty( $title ) )
+		if ( ! empty( $title ) ) {
 			echo $args['before_title'] . $title . $args['after_title'];
+		}
 		echo "<strong class='date'>$display_date</strong>";
-		echo $ics_form;
 		if ( ! empty( $extra_info ) ) {
 			echo "<p>$extra_info</p>";
 		}
+		echo $ics_form;
+		echo "<a href='{$google_calendar_link}' target='" . esc_attr( '_blank' ) . "'><img src='//www.google.com/calendar/images/ext/gc_button1.gif' border=0></a>";
+
+
 		echo $args['after_widget'];
 	}
 
@@ -112,8 +122,7 @@ HTML;
 			$title      = esc_attr( $instance['title'] );
 			$date       = esc_attr( $instance['date'] );
 			$extra_info = esc_textarea( $instance['extra_info'] );
-		}
-		else {
+		} else {
 			$title      = '';
 			$date       = '2010-01-01';
 			$extra_info = '';
