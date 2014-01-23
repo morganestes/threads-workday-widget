@@ -2,13 +2,13 @@
 /*
 Plugin Name: Threads OKC Workdays
 Plugin URI: http://threadsokc.github.io/workday-widget
+GitHub Plugin URI: threadsokc/threads-workday-widget
 Description: Adds a widget with the upcoming work day.
-Version: 0.2.2
+Version: 0.2.3
 Author: morganestes
 Author URI: http://www.morganestes.me
 License: GPLv2 or later
 Text Domain: threadsokc
-GitHub Plugin URI: morganestes/threads-workday-widget
 */
 
 
@@ -105,8 +105,6 @@ HTML;
 		}
 		echo $ics_form;
 		echo "<a href='{$google_calendar_link}' target='" . esc_attr( '_blank' ) . "'><img src='//www.google.com/calendar/images/ext/gc_button1.gif' border=0></a>";
-
-
 		echo $args['after_widget'];
 	}
 
