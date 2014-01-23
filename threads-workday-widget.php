@@ -3,7 +3,7 @@
 Plugin Name: Threads OKC Workdays
 Plugin URI: http://threadsokc.github.io/workday-widget
 Description: Adds a widget with the upcoming work day.
-Version: 0.2.1
+Version: 0.2.2
 Author: morganestes
 Author URI: http://www.morganestes.me
 License: GPLv2 or later
