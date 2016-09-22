@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: Threads OKC Workdays
-Plugin URI: http://threadsokc.github.io/workday-widget
+Plugin URI: https://github.com/threadsokc/threads-workday-widget
 GitHub Plugin URI: threadsokc/threads-workday-widget
 Description: Adds a widget with the upcoming work day.
-Version: 0.2.3
+Version: 0.3.0-WIP
 Author: morganestes
-Author URI: http://www.morganestes.me
+Author URI: https://morganestes.com
 License: GPLv2 or later
 Text Domain: threadsokc
 */
