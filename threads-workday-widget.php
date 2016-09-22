@@ -52,7 +52,6 @@ class Threads_Widget extends \WP_Widget {
 	 * @param array $instance Saved values from database.
 	 */
 	public function widget( $args, $instance ) {
-		$title      = apply_filters( 'widget_title', $instance['title'] );
 		$date       = $instance['date'];
 		$extra_info = apply_filters( 'widget_text', $instance['extra_info'] );
 
@@ -96,8 +95,8 @@ HTML;
 		$google_calendar_link = esc_url( "http://www.google.com/calendar/event?action=TEMPLATE&text={$google_calendar_atts['text']}&dates={$event_info['datestart']}/{$event_info['dateend']}&details=&location={$google_calendar_atts['location']}&trp=false&sprop={$google_calendar_atts['sprop']}&sprop=name:{$event_info['uri']}" );
 
 		echo $args['before_widget'];
-		if ( ! empty( $title ) ) {
-			echo $args['before_title'] . $title . $args['after_title'];
+		if ( ! empty( $instance['title'] ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
 		}
 		echo "<strong class='date'>$display_date</strong>";
 		if ( ! empty( $extra_info ) ) {
